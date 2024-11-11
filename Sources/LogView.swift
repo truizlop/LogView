@@ -58,13 +58,46 @@ public struct LogView: View {
       }
     }
     .sheet(item: $selected) { log in
+#if targetEnvironment(macCatalyst)
+      NavigationView {
+        LogViewDetail(log: log)
+          .environmentObject(model)
+          .navigationTitle("Detail")
+          .navigationBarTitleDisplayMode(.inline)
+          .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+              Button("Close") {
+                selected = nil
+              }
+            }
+          }
+      }
+#else
       LogViewDetail(log: log)
         .environmentObject(model)
+#endif
     }
     .sheet(isPresented: $filterPresented, content: {
+#if targetEnvironment(macCatalyst)
+        NavigationView {
+          FilterView()
+            .environmentObject(model)
+            .sheetDefaultSettings()
+            .navigationTitle("Filter")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+               ToolbarItem(placement: .topBarLeading) {
+                 Button("Close") {
+                   filterPresented = false
+                 }
+               }
+             }
+        }
+#else
       FilterView()
         .environmentObject(model)
         .sheetDefaultSettings()
+#endif
     })
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
